@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+
+    <Console name="Console" target="SYSTEM_OUT" follow="true">
+        <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss a}] [%t] [%-8p] %l - %m%n"/>
+    </Console>
+
+    <logger name="org.springframework" level="INFO"/>
+
+    <logger name="com.sung.housingfinance" level="INFO"/>
+
+    <logger name="org.apache.http" level="INFO"/>
+
+    <springProfile name="local">
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+
+</configuration>
