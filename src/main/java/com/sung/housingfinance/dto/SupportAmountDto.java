@@ -8,6 +8,6 @@ import lombok.Data;
 
 @Data
 public class SupportAmountDto {
-    String year;
-    String amount;
+    private String year;
+    private String amount;
 }
