@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class RequestDataFor5th {
-    String bank;
-    String month;
+    private String bank;
+    private String month;
 
 }

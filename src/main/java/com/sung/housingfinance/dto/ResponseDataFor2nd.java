@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 public class ResponseDataFor2nd {
 
-    String name;
-    List<SupportDataDto> supportDataList;
+    private String name;
+    private List<SupportTotalDto> supportDataList;
 }

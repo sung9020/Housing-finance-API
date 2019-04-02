@@ -5,6 +5,6 @@ package com.sung.housingfinance.dto;/*
  */
 
 public class ResponseDataFor3rd {
-    String year;
-    String bank;
+    private String year;
+    private String bank;
 }

@@ -7,5 +7,5 @@ package com.sung.housingfinance.dto;/*
 import java.util.List;
 
 public class ResponseDataFor1st {
-    public List<BankDataDto> bankList;
+    private List<BankDataDto> bankList;
 }

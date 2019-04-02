@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 public class ResponseDataFor4th {
 
-    String bank;
-    List<SupportAmountDto> support_amount;
+    private String bank;
+    private List<SupportAmountDto> support_amount;
 }

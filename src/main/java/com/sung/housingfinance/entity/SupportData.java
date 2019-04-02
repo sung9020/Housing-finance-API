@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Table(indexes = {
         @Index(name = "IDX_YEAR_MONTH", columnList = "year, month")
 })
-public class SupportDataEntity {
+public class SupportData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,12 +34,11 @@ public class SupportDataEntity {
     private int month;
 
     @Column
-    private String institute_name;
+    private String instituteName;
 
     @Column
-    private String institute_code;
+    private String instituteCode;
 
     @Column
-    private int support_value;
-
+    private int supportValue;
 }
