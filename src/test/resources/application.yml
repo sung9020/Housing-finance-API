@@ -17,25 +17,21 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
-  server:
-    tomcat:
-      accesslog:
-        pattern: common - %a %u %{yyyy-MM-dd HH:mm:ss}t "%r" %s %b
-        enabled: true
-      basedir: c:/housingfinance/log
-    port: 9090
+server:
+  tomcat:
+    basedir: c:/housingfinance/log
+  port: 9090
 
-  management:
-    security:
-      enabled: false
+security:
+  jwt:
+    config:
+      secretKey: HousingFinanceSecretKey
+      expireInMilliseconds: 1800000
 
-  static:
-    resource:
-      location: file:///C:/housingfinance/
 
-#logging:
-#  level:
-#   ROOT: DEBUG
+logging:
+  level:
+   ROOT: DEBUG
 ---
 
 spring:
@@ -58,23 +54,18 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
-  server:
-    tomcat:
-      accesslog:
-        pattern: common - %a %u %{yyyy-MM-dd HH:mm:ss}t "%r" %s %b
-        enabled: true
-      basedir: c:/housingfinance/log
-    port: 9090
+server:
+  tomcat:
+    basedir: c:/housingfinance/log
+  port: 9090
 
-  management:
-    security:
-      enabled: false
+security:
+  jwt:
+    config:
+      secretKey: HousingFinanceSecretKey
+      expireInMilliseconds: 1800000
 
-  static:
-    resource:
-      location: file:///C:/housingfinance/
-
-  logging:
-    level:
-      ROOT: DEBUG
+logging:
+  level:
+    ROOT: DEBUG
 ---

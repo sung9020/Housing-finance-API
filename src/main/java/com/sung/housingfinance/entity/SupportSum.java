@@ -2,7 +2,7 @@ package com.sung.housingfinance.entity;
 
 import lombok.Data;
 
-import java.time.Year;
+import javax.persistence.Entity;
 /*
  *
  * @author 123msn

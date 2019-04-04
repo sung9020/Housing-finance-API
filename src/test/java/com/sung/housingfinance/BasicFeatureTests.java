@@ -2,6 +2,7 @@ package com.sung.housingfinance;
 
 import com.sung.housingfinance.constants.FileEnum;
 import com.sung.housingfinance.dto.BankDataDto;
+import com.sung.housingfinance.dto.SupportAmountDto;
 import com.sung.housingfinance.dto.SupportDataDto;
 import com.sung.housingfinance.dto.SupportTotalDto;
 import com.sung.housingfinance.entity.Bank;
@@ -29,7 +30,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertThat;
 
@@ -95,15 +98,15 @@ public class BasicFeatureTests {
         List<BankDataDto> bankList = Streams.stream(bankDataIterable).map(BankDataDto::new).collect(Collectors.toList());
 
         assertThat(bankList, Matchers.hasSize(9));
-        assertThat(bankList.get(0).getInstitute_name(), Matchers.is("주택도시기금"));
-        assertThat(bankList.get(1).getInstitute_name(), Matchers.is("국민은행"));
-        assertThat(bankList.get(2).getInstitute_name(), Matchers.is("우리은행"));
-        assertThat(bankList.get(3).getInstitute_name(), Matchers.is("신한은행"));
-        assertThat(bankList.get(4).getInstitute_code(), Matchers.is("BNK027"));
-        assertThat(bankList.get(5).getInstitute_code(), Matchers.is("BNK025"));
-        assertThat(bankList.get(6).getInstitute_code(), Matchers.is("BNK012"));
-        assertThat(bankList.get(7).getInstitute_code(), Matchers.is("BNK005"));
-        assertThat(bankList.get(8).getInstitute_code(), Matchers.is("BNK051"));
+        assertThat(bankList.get(0).getInstitute_name(), Matchers.equalTo("주택도시기금"));
+        assertThat(bankList.get(1).getInstitute_name(), Matchers.equalTo("국민은행"));
+        assertThat(bankList.get(2).getInstitute_name(), Matchers.equalTo("우리은행"));
+        assertThat(bankList.get(3).getInstitute_name(), Matchers.equalTo("신한은행"));
+        assertThat(bankList.get(4).getInstitute_code(), Matchers.equalTo("BNK027"));
+        assertThat(bankList.get(5).getInstitute_code(), Matchers.equalTo("BNK025"));
+        assertThat(bankList.get(6).getInstitute_code(), Matchers.equalTo("BNK012"));
+        assertThat(bankList.get(7).getInstitute_code(), Matchers.equalTo("BNK005"));
+        assertThat(bankList.get(8).getInstitute_code(), Matchers.equalTo("BNK051"));
     }
 
     @Test
@@ -131,9 +134,9 @@ public class BasicFeatureTests {
 
                 SupportTotalDto supportTotal = new SupportTotalDto();
                 Map<String, Long> detail_amount = new HashMap<>();
+                detail_amount.put(instituteName, supportSum);
                 yearArray.add(year);
 
-                detail_amount.put(instituteName, supportSum);
                 supportTotal.setDetail_amount(detail_amount);
                 supportTotal.setYear(year);
                 supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
@@ -141,8 +144,8 @@ public class BasicFeatureTests {
             }else{
                 SupportTotalDto supportTotal = supportTotalList.stream().filter( o -> o.getYear() == year).findFirst().get();
                 Map<String, Long> detail_amount = supportTotal.getDetail_amount();
-
                 detail_amount.put(instituteName, supportSum);
+
                 supportTotal.setYear(year);
                 supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
                 supportTotalList.add(supportTotal);
@@ -157,29 +160,41 @@ public class BasicFeatureTests {
             }
         }
 
-        assertThat(testData.getYear(), Matchers.is(2014));
+        assertThat(testData.getYear(), Matchers.equalTo(2014));
         assertThat(testData.getDetail_amount(), Matchers.hasKey("우리은행"));
-        assertThat(testData.getTotal_amount(), Matchers.is(318771L));
+        assertThat(testData.getTotal_amount(), Matchers.equalTo(318771L));
     }
 
     @Test
-    public void getMaxSupportSumTest(){
+    public void 최대지원금액_은행_연도_구하기_Test(){
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
         SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSupportSum)).get();
 
-        assertThat(maxSupport.getInstituteName(), Matchers.is("주택도시기금"));
-        assertThat(maxSupport.getSupportSum(), Matchers.is(96184L));
-        assertThat(maxSupport.getYear(),Matchers.is(2014));
+        assertThat(maxSupport.getInstituteName(), Matchers.equalTo("주택도시기금"));
+        assertThat(maxSupport.getSupportSum(), Matchers.equalTo(96184L));
+        assertThat(maxSupport.getYear(),Matchers.equalTo(2014));
     }
 
     @Test
-    public void getKEBMinMaxDataTest(){
+    public void 외환은행_최대최소_지원금구하기_Test(){
         List<SupportAvg> supportAvgList = supportDataRepository.findBySupportAvg("외환은행");
-        Long max = Math.round(supportAvgList.stream().max(Comparator.comparing(SupportAvg::getSupportAvg)).get().getSupportAvg());
-        Long min = Math.round(supportAvgList.stream().min(Comparator.comparing(SupportAvg::getSupportAvg)).get().getSupportAvg());
+        SupportAmountDto supportMax = new SupportAmountDto();
+        SupportAmountDto supportMin = new SupportAmountDto();
 
-        assertThat(max, Matchers.is(1702L));
-        assertThat(min, Matchers.is(0L));
+        Optional<SupportAvg> supportMaxOptional =supportAvgList.stream().max(Comparator.comparing(SupportAvg::getSupportAvg));
+        supportMaxOptional.ifPresent(supportAvg -> {
+            supportMax.setYear(supportAvg.getYear());
+            supportMax.setAmount(Math.round(supportAvg.getSupportAvg()));
+        });
+
+        Optional<SupportAvg> supportMinOptional =supportAvgList.stream().min(Comparator.comparing(SupportAvg::getSupportAvg));
+        supportMinOptional.ifPresent(supportAvg -> {
+            supportMin.setYear(supportAvg.getYear());
+            supportMin.setAmount(Math.round(supportAvg.getSupportAvg()));
+        });
+
+        assertThat(supportMax.getAmount(), Matchers.equalTo(1702L));
+        assertThat(supportMin.getAmount(), Matchers.equalTo(0L));
     }
 
     @Test

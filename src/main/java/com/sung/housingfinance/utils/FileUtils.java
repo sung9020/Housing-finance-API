@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class FileUtils {
 
-    public List<List<String>> readCsv(File file) throws Exception{
+    public static List<List<String>> readCsv(File file) throws Exception{
         List<List<String>> result = new ArrayList<>();
 
         BufferedReader bufferedReader = new BufferedReader(

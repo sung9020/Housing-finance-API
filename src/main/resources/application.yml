@@ -20,19 +20,13 @@ spring:
 
 server:
   tomcat:
-    accesslog:
-      pattern: common - %a %u %{yyyy-MM-dd HH:mm:ss}t "%r" %s %b
-      enabled: true
-    basedir: c:/housingfinance/log
+     basedir: c:/housingfinance/log
   port: 9090
 
-management:
-  security:
-    enabled: false
-
-static:
-  resource:
-    location: file:///C:/housingfinance/
-
+security:
+  jwt:
+    config:
+      secretKey: HousingFinanceSecretKey
+      expireInMilliseconds: 1800000
 
 ---

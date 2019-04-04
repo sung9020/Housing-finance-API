@@ -8,17 +8,18 @@ package com.sung.housingfinance.constants;
 import lombok.Getter;
 
 public enum ErrorEnum {
-    SUCCESS(1, "요청에 성공했습니다."),
-    RUNTIME_ERROR(1000, "서버 에러가 발생했습니다.");
-
+    SUCCESS("1", "요청에 성공했습니다."),
+    RUNTIME_ERROR("500", "서버 에러가 발생했습니다."),
+    FORBIDDEN_ERROR("403", "접근이 금지되었습니다. "),
+    ALREADY_REGISTERED_USER_ERROR("1000", "이미 등록된 유저입니다.");
 
     @Getter
-    private final int errorCode;
+    private final String errorCode;
 
     @Getter
     private final String msg;
 
-    ErrorEnum(int errorCode, String msg) {
+    ErrorEnum(String errorCode, String msg) {
         this.errorCode = errorCode;
         this.msg = msg;
     }

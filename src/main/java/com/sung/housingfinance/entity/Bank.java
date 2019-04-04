@@ -23,4 +23,5 @@ public class Bank {
     @Column(unique = true)
     private String instituteCode;
 
+
 }
