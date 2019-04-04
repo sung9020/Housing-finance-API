@@ -7,8 +7,10 @@ package com.sung.housingfinance;/*
 import com.sung.housingfinance.dto.BankDataDto;
 import com.sung.housingfinance.entity.Bank;
 import com.sung.housingfinance.entity.SupportData;
+import com.sung.housingfinance.entity.User;
 import com.sung.housingfinance.repositoy.BankDataRepository;
 import com.sung.housingfinance.repositoy.SupportDataRepository;
+import com.sung.housingfinance.repositoy.UserRepository;
 import org.assertj.core.util.Streams;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -21,6 +23,8 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -43,8 +47,19 @@ public class RepositoryTests {
     @Autowired
     private BankDataRepository bankDataRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
+    private PasswordEncoder passwordEncoder;
+
+    @Before
+    public void setup(){
+        passwordEncoder = new BCryptPasswordEncoder();
+    }
+
     @Test
-    public void getSupportDataTest(){
+    public void 주택금융_지원금액_데이터넣기_Test(){
         SupportData supportDataA = new SupportData();
         supportDataA.setYear(2014);
         supportDataA.setMonth(3);
@@ -60,7 +75,7 @@ public class RepositoryTests {
         }
 
     @Test
-    public void getBankListTest(){
+    public void 은행리스트_넣기_Test(){
         Bank bankA = new Bank();
         bankA.setInstituteName("주택도시기금");
         bankA.setInstituteCode("BNK093");
@@ -79,4 +94,18 @@ public class RepositoryTests {
         assertThat(bankList, Matchers.hasSize(2));
     }
 
+    @Test
+    public void 유저정보_넣기_Test(){
+        User user = new User();
+
+        user.setUsername("admin");
+        user.setPassword(passwordEncoder.encode("1234"));
+        userRepository.save(user);
+
+        User user1 = userRepository.findByUsername("admin");
+
+        assertThat(user1, Matchers.notNullValue());
+        assertThat(user1.getUsername(), Matchers.equalTo("admin"));
+        assertThat(user1.getPassword(), Matchers.notNullValue());
+    }
 }

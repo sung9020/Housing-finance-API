@@ -6,8 +6,11 @@ package com.sung.housingfinance.dto;/*
 
 import lombok.Data;
 
+/**
+ * 지원 금액, 연도 DTO
+ */
 @Data
 public class SupportAmountDto {
-    private String year;
-    private String amount;
+    private int year;
+    private Long amount;
 }

@@ -8,6 +8,9 @@ package com.sung.housingfinance.dto;
 import com.sung.housingfinance.entity.Bank;
 import lombok.Data;
 
+/**
+ * 은행 데이터 DTO
+ */
 @Data
 public class BankDataDto {
     private String institute_name;
