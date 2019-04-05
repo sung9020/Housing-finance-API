@@ -4,10 +4,7 @@ package com.sung.housingfinance.dto.response;
  * @since 2019-04-03
  */
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.Setter;
 /**
  *  요청시 기본 출력
  */

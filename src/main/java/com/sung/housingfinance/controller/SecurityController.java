@@ -1,21 +1,16 @@
 package com.sung.housingfinance.controller;
 
 import com.sung.housingfinance.dto.request.RequestDataForUser;
-import com.sung.housingfinance.dto.response.ResponseData;
 import com.sung.housingfinance.dto.response.ResponseDataForUser;
 import com.sung.housingfinance.security.SecurityInterface;
-import com.sung.housingfinance.security.impl.SecurityService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /*
  *

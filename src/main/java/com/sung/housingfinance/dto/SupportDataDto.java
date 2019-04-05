@@ -7,11 +7,6 @@ package com.sung.housingfinance.dto;/*
 import com.sung.housingfinance.entity.SupportData;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 /**
  * 지원 금액 원본데이터 DTO
  */

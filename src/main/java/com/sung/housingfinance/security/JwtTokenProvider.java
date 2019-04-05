@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -23,9 +22,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -49,6 +48,8 @@ public class JwtTokenProvider {
     public String createToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         claims.put("auth", AuthorityUtils.createAuthorityList(RoleEnum.ADMIN.getRole()));
+        claims.setId(String.valueOf(UUID.randomUUID()));
+
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + expireInMilliseconds);
 

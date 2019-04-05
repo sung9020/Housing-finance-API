@@ -5,7 +5,6 @@ package com.sung.housingfinance.dto.response;/*
  */
 
 import lombok.Data;
-import lombok.Setter;
 
 /**
  * 에러용 응답 출력

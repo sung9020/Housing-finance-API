@@ -1,18 +1,15 @@
 package com.sung.housingfinance.security;
 
-import com.sun.security.auth.UserPrincipal;
 import com.sung.housingfinance.constants.RoleEnum;
 import com.sung.housingfinance.entity.User;
 import com.sung.housingfinance.repositoy.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import java.util.Optional;
 
 /*

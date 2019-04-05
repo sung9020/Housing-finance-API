@@ -2,7 +2,6 @@ package com.sung.housingfinance.security.impl;
 
 import com.sung.housingfinance.constants.ErrorEnum;
 import com.sung.housingfinance.dto.request.RequestDataForUser;
-import com.sung.housingfinance.dto.response.ResponseData;
 import com.sung.housingfinance.dto.response.ResponseDataForUser;
 import com.sung.housingfinance.entity.User;
 import com.sung.housingfinance.repositoy.UserRepository;
@@ -13,13 +12,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityExistsException;
-import javax.servlet.http.HttpServletRequest;
-import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 
 /*

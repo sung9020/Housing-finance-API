@@ -5,7 +5,6 @@ package com.sung.housingfinance.dto.response;/*
  */
 
 import lombok.Data;
-import lombok.Setter;
 
 /**
  * 특정 은행의 특정 달에 대한 금융 지원 금액 예측(2018년) 출력

@@ -5,7 +5,6 @@ package com.sung.housingfinance.entity;/*
  */
 
 import lombok.Data;
-import org.springframework.stereotype.Indexed;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.NamedEntityGraph;
 import javax.persistence.Table;
 
 @Data

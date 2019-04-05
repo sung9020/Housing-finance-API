@@ -15,12 +15,9 @@ import com.sung.housingfinance.utils.FileUtils;
 import org.assertj.core.util.Streams;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -143,7 +140,6 @@ public class BasicFeatureTests {
 
                 supportTotal.setYear(year);
                 supportTotal.setTotal_amount(supportTotal.getTotal_amount() + sum);
-                supportTotalList.add(supportTotal);
             }
         }
 

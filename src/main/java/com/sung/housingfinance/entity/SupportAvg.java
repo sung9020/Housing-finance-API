@@ -2,8 +2,6 @@ package com.sung.housingfinance.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-
 /*
  *
  * @author 123msn

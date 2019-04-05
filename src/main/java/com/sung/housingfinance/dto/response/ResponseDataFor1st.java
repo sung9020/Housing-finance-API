@@ -6,7 +6,6 @@ package com.sung.housingfinance.dto.response;/*
 
 import com.sung.housingfinance.dto.BankDataDto;
 import lombok.Data;
-import lombok.Setter;
 
 import java.util.List;
 

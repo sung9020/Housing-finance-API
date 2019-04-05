@@ -5,7 +5,6 @@ package com.sung.housingfinance.dto.response;/*
  */
 
 import lombok.Data;
-import lombok.Setter;
 
 /**
  * 연도별 지원금액이 가장 큰 은행, 연도 출력
