@@ -15,6 +15,7 @@ import org.assertj.core.util.Streams;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -93,7 +94,6 @@ public class RepositoryTests {
         assertThat(bankList, Matchers.notNullValue());
         assertThat(bankList, Matchers.hasSize(2));
     }
-
     @Test
     public void 유저정보_넣기_Test(){
         User user = new User();

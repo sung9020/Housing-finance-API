@@ -3,8 +3,6 @@ package com.sung.housingfinance.security;
 import com.sung.housingfinance.dto.request.RequestDataForUser;
 import com.sung.housingfinance.dto.response.ResponseDataForUser;
 
-import javax.servlet.http.HttpServletRequest;
-
 /*
  *
  * @author 123msn

@@ -13,6 +13,4 @@ public class RequestDataForUser {
     private String username;
 
     private String password;
-
-    private String token;
 }

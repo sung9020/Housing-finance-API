@@ -3,6 +3,8 @@ package com.sung.housingfinance.controller;
 import com.sung.housingfinance.dto.response.ResponseData;
 import com.sung.housingfinance.dto.response.ResponseDataFor1st;
 import com.sung.housingfinance.service.BankInterface;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("bank")
+@RequestMapping("api/bank")
 public class BankController {
 
     @Autowired
@@ -24,6 +26,7 @@ public class BankController {
 
 
     @GetMapping("")
+    @ApiOperation(value ="주택금융 금융기관 리스트 출력")
     public ResponseDataFor1st bankList(){
 
         ResponseDataFor1st response = bankInterface.getBankList();

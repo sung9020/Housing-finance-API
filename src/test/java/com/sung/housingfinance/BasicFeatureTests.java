@@ -15,7 +15,9 @@ import com.sung.housingfinance.utils.FileUtils;
 import org.assertj.core.util.Streams;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,13 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles(profiles = "local")
+@ActiveProfiles(profiles = "test")
 public class BasicFeatureTests {
 
     @Autowired
@@ -47,33 +49,10 @@ public class BasicFeatureTests {
     @Autowired
     private BankDataRepository bankDataRepository;
 
-    @InjectMocks
-    private FileUtils fileUtils;
-
-    List<BankDataDto> bankList;
-
     @Before
     public void setup() throws Exception{
-        File file = new File("housing_finance_support_data.csv");
-        List<List<String>> fileData = fileUtils.readCsv(file);
-        SupportDataDto supportDataDto = new SupportDataDto();
-        int rowSize = fileData.size();
-        FileEnum[] fileEnums = FileEnum.values();
-
-        for(int i = 1; i < rowSize; i++){
-            List<String> row = fileData.get(i);
-            supportDataDto.setYear(Integer.valueOf(row.get(FileEnum.YEAR.getCol())));
-            supportDataDto.setMonth(Integer.valueOf(row.get(FileEnum.MONTH.getCol())));
-
-            for(FileEnum fileEnum : fileEnums){
-                if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
-                    supportDataDto.setInstituteName(fileEnum.getInstitute_name());
-                    supportDataDto.setInstituteCode(fileEnum.getInstitute_code());
-                    supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
-                    supportDataRepository.save(supportDataDto.toEntity());
-                }
-            }
-        }
+        setFileList();
+        setBankList();
     }
 
     @After
@@ -86,16 +65,33 @@ public class BasicFeatureTests {
     @Test
     public void csv_읽기_Test() throws Exception{
         File file = new File("housing_finance_support_data.csv");
-        List<List<String>> supportData = fileUtils.readCsv(file);
+        List<List<String>> supportData = FileUtils.readCsv(file);
 
         assertThat(supportData, Matchers.notNullValue());
         assertThat(supportData, Matchers.hasSize(155));
     }
 
     @Test
+    public void 은행이름으로_은행코드_찾기_Test() {
+        String sampleBank = "우리은행";
+        Iterable<Bank> bankDataIterable = bankDataRepository.findAll();
+        String resultBankCode = "";
+        for(Bank bank : bankDataIterable){
+            if(sampleBank.equals(bank.getInstituteName())){
+                resultBankCode = bank.getInstituteCode();
+            }
+        }
+
+        assertThat(resultBankCode, Matchers.notNullValue());
+        assertThat(resultBankCode, Matchers.equalTo("BNK020"));
+
+    }
+
+    @Test
     public void 은행명_은행코드_조회_Test() {
         Iterable<Bank> bankDataIterable = bankDataRepository.findAll();
-        List<BankDataDto> bankList = Streams.stream(bankDataIterable).map(BankDataDto::new).collect(Collectors.toList());
+
+        List<BankDataDto> bankList = StreamSupport.stream(bankDataIterable.spliterator(),false).map(BankDataDto::new).collect(Collectors.toList());
 
         assertThat(bankList, Matchers.hasSize(9));
         assertThat(bankList.get(0).getInstitute_name(), Matchers.equalTo("주택도시기금"));
@@ -115,7 +111,7 @@ public class BasicFeatureTests {
         List<SupportDataDto> supportDataList = Streams.stream(supportDataIterable).map(SupportDataDto::new).collect(Collectors.toList());
 
         assertThat(supportDataList, Matchers.notNullValue());
-        assertThat(supportDataList, Matchers.hasSize(1694));
+        assertThat(supportDataList, Matchers.hasSize(154 * 9)); // data row * col
     }
 
 
@@ -128,26 +124,25 @@ public class BasicFeatureTests {
         for(SupportSum supportOperation : supportSumList){
             int year = supportOperation.getYear();
             String instituteName = supportOperation.getInstituteName();
-            long supportSum = supportOperation.getSupportSum();
+            long sum = supportOperation.getSum();
 
             if(!yearArray.contains(year)){
-
                 SupportTotalDto supportTotal = new SupportTotalDto();
                 Map<String, Long> detail_amount = new HashMap<>();
-                detail_amount.put(instituteName, supportSum);
+                detail_amount.put(instituteName, sum);
                 yearArray.add(year);
 
                 supportTotal.setDetail_amount(detail_amount);
                 supportTotal.setYear(year);
-                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
+                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + sum);
                 supportTotalList.add(supportTotal);
             }else{
                 SupportTotalDto supportTotal = supportTotalList.stream().filter( o -> o.getYear() == year).findFirst().get();
                 Map<String, Long> detail_amount = supportTotal.getDetail_amount();
-                detail_amount.put(instituteName, supportSum);
+                detail_amount.put(instituteName, sum);
 
                 supportTotal.setYear(year);
-                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
+                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + sum);
                 supportTotalList.add(supportTotal);
             }
         }
@@ -157,6 +152,7 @@ public class BasicFeatureTests {
         for(SupportTotalDto temp : supportTotalList){
             if(temp.getYear() == 2014){
                 testData = temp;
+                break;
             }
         }
 
@@ -168,10 +164,10 @@ public class BasicFeatureTests {
     @Test
     public void 최대지원금액_은행_연도_구하기_Test(){
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
-        SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSupportSum)).get();
+        SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSum)).get();
 
         assertThat(maxSupport.getInstituteName(), Matchers.equalTo("주택도시기금"));
-        assertThat(maxSupport.getSupportSum(), Matchers.equalTo(96184L));
+        assertThat(maxSupport.getSum(), Matchers.equalTo(96184L));
         assertThat(maxSupport.getYear(),Matchers.equalTo(2014));
     }
 
@@ -200,6 +196,82 @@ public class BasicFeatureTests {
     @Test
     public void getPredictedSupportDataTest(){
 
+
+    }
+
+    private String getBankCode(String bankName){
+            Iterable<Bank> bankDataIterable = bankDataRepository.findAll();
+            String bankCode = "";
+            for(Bank bank : bankDataIterable){
+                if(bankName.equals(bank.getInstituteName())){
+                    bankCode = bank.getInstituteCode();
+                }
+            }
+
+            return bankCode;
+    }
+
+    private void setFileList() throws Exception{
+        File file = new File("housing_finance_support_data.csv");
+        List<List<String>> fileData = FileUtils.readCsv(file);
+        SupportDataDto supportDataDto = new SupportDataDto();
+        int rowSize = fileData.size();
+        FileEnum[] fileEnums = FileEnum.values();
+
+        for(int i = 1; i < rowSize; i++){
+            List<String> row = fileData.get(i);
+            supportDataDto.setYear(Integer.valueOf(row.get(FileEnum.YEAR.getCol())));
+            supportDataDto.setMonth(Integer.valueOf(row.get(FileEnum.MONTH.getCol())));
+
+            for(FileEnum fileEnum : fileEnums){
+                if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
+                    supportDataDto.setInstituteName(fileEnum.getInstitute_name());
+                    supportDataDto.setInstituteCode(getBankCode(fileEnum.getInstitute_name()));
+                    supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
+                    supportDataRepository.save(supportDataDto.toEntity());
+                }
+            }
+        }
+    }
+
+    private void setBankList(){
+
+        Bank bankA = new Bank();
+        bankA.setInstituteName("주택도시기금");
+        bankA.setInstituteCode("BNK093");
+        bankDataRepository.save(bankA);
+        Bank bankB = new Bank();
+        bankB.setInstituteName("국민은행");
+        bankB.setInstituteCode("BNK019");
+        bankDataRepository.save(bankB);
+        Bank bankC = new Bank();
+        bankC.setInstituteName("우리은행");
+        bankC.setInstituteCode("BNK020");
+        bankDataRepository.save(bankC);
+        Bank bankD = new Bank();
+        bankD.setInstituteName("신한은행");
+        bankD.setInstituteCode("BNK021");
+        bankDataRepository.save(bankD);
+        Bank bankF = new Bank();
+        bankF.setInstituteName("한국시티은행");
+        bankF.setInstituteCode("BNK027");
+        bankDataRepository.save(bankF);
+        Bank bankG = new Bank();
+        bankG.setInstituteName("하나은행");
+        bankG.setInstituteCode("BNK025");
+        bankDataRepository.save(bankG);
+        Bank bankH = new Bank();
+        bankH.setInstituteName("농협은행/수협은행");
+        bankH.setInstituteCode("BNK012");
+        bankDataRepository.save(bankH);
+        Bank bankI = new Bank();
+        bankI.setInstituteName("외환은행");
+        bankI.setInstituteCode("BNK005");
+        bankDataRepository.save(bankI);
+        Bank bankJ = new Bank();
+        bankJ.setInstituteName("기타은행");
+        bankJ.setInstituteCode("BNK051");
+        bankDataRepository.save(bankJ);
 
     }
 

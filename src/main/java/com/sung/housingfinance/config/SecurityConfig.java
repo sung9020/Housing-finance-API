@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/**
+ * 스프링 시큐리티 설정
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -48,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    /*ignore resources*/
+    /*ignore resources, swagger */
     @Override
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
@@ -56,7 +59,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .ignoring()
                 .antMatchers(
                         "/resources/**",
-                        "/static/**"
+                        "/static/**",
+                        "/v2/api-docs/**",
+                        "/configuration/ui/**",
+                        "/swagger-resources/**",
+                        "/configuration/security/**",
+                        "/swagger-ui.html",
+                        "/webjars/**"
                 );
     }
 
@@ -70,9 +79,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/h2-console/**")
                 .permitAll()
-                .antMatchers("/auth/signIn")
+                .antMatchers("/api/auth/signIn")
                 .permitAll()
-                .antMatchers("/auth/signUp")
+                .antMatchers("/api/auth/signUp")
                 .permitAll()
                 .anyRequest().authenticated()    //Adding this line solved it
                 .and()

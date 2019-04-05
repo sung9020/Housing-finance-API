@@ -12,4 +12,5 @@ public interface BankInterface {
 
     ResponseDataFor1st getBankList();
 
+    String getBankCode(String bankName);
 }

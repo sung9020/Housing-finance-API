@@ -11,17 +11,23 @@ import com.sung.housingfinance.repositoy.UserRepository;
 import com.sung.housingfinance.security.JwtTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -34,7 +40,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles(profiles = "local")
+@ActiveProfiles(profiles = "test")
 public class SecurityTests {
 
     @Autowired
@@ -58,7 +64,7 @@ public class SecurityTests {
     @Before
     public void setup(){
         User user = new User();
-        if(!userRepository.existsByUsername(sampleUsername1)){
+        if(!userRepository.existsByUsername(sampleUsername2)){
             user.setUsername(sampleUsername2);
             user.setPassword(passwordEncoder.encode(samplePassword2));
             userRepository.save(user);
@@ -71,7 +77,7 @@ public class SecurityTests {
     }
 
     @Test
-    public void 가입_재시도_Tests() throws Exception{
+    public void 가입_재시도_Tests() {
         User user = new User();
         String token = "";
 
@@ -94,7 +100,7 @@ public class SecurityTests {
     }
 
     @Test
-    public void 가입_Tests() throws Exception{
+    public void 가입_Tests(){
         User user = new User();
         String token = "";
 
@@ -111,7 +117,7 @@ public class SecurityTests {
     }
 
     @Test
-    public void 로그인_Tests() throws Exception{
+    public void 로그인_Tests() {
         String token = "";
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sampleUsername2, samplePassword2));
         token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException(""));
@@ -120,13 +126,11 @@ public class SecurityTests {
     }
 
     @Test
-    public void 토큰갱신_Tests() throws Exception{
+    public void 토큰갱신_Tests() {
+        String token1 = "";
+        Authentication authentication = new TestingAuthenticationToken(sampleUsername2, samplePassword2);
+        token1 = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException(""));
 
-        String token = "";
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(sampleUsername2, samplePassword2));
-        token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException(""));
-
-        String token1 = token; // getJwtByRequest() 대체
         authentication = jwtTokenProvider.getAuthentication(token1);
         String token2 = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException("Not found UserInfo"));
 

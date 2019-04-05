@@ -1,19 +1,17 @@
-package com.sung.housingfinance.utils;/*
+package com.sung.housingfinance.utils;
+/*
  *
  * @author 123msn
  * @since 2019-04-01
  */
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j

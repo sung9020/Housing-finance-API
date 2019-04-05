@@ -11,12 +11,14 @@ import com.sung.housingfinance.dto.response.ResponseDataFor3rd;
 import com.sung.housingfinance.dto.response.ResponseDataFor4th;
 import com.sung.housingfinance.dto.response.ResponseDataFor5th;
 import com.sung.housingfinance.entity.SupportAvg;
+import com.sung.housingfinance.entity.SupportData;
 import com.sung.housingfinance.entity.SupportSum;
 import com.sung.housingfinance.repositoy.SupportDataRepository;
 import com.sung.housingfinance.service.SupportDataInterface;
 import com.sung.housingfinance.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /*
  *
@@ -37,34 +40,47 @@ public class SupportDataService implements SupportDataInterface {
     @Autowired
     private SupportDataRepository supportDataRepository;
 
+    @Autowired
+    private BankService bankService;
+
     private final String TITLE = "주택금융 공급현황";
 
 
     @Override
+    @Transactional
     public ResponseData setSupportData() throws Exception {
         ResponseData responseData = new ResponseData();
-        responseData.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
-        responseData.setMsg(ErrorEnum.SUCCESS.getMsg());
 
-        File file = new File("housing_finance_support_data.csv");
-        List<List<String>> fileData = FileUtils.readCsv(file);
-        SupportDataDto supportDataDto = new SupportDataDto();
-        int rowSize = fileData.size();
-        FileEnum[] fileEnums = FileEnum.values();
+        List<SupportData> supportDataIterable = supportDataRepository.findAll();
 
-        for(int i = 1; i < rowSize; i++){
-            List<String> row = fileData.get(i);
-            supportDataDto.setYear(Integer.valueOf(row.get(FileEnum.YEAR.getCol())));
-            supportDataDto.setMonth(Integer.valueOf(row.get(FileEnum.MONTH.getCol())));
+        if(supportDataIterable.size() > 0){
+            responseData.setErrorCode(ErrorEnum.ALREADY_REGISTERED_FILE_ERROR.getErrorCode());
+            responseData.setMsg(ErrorEnum.ALREADY_REGISTERED_FILE_ERROR.getMsg());
 
-            for(FileEnum fileEnum : fileEnums){
-                if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
-                    supportDataDto.setInstituteName(fileEnum.getInstitute_name());
-                    supportDataDto.setInstituteCode(fileEnum.getInstitute_code());
-                    supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
-                    supportDataRepository.save(supportDataDto.toEntity());
+        }else{
+            File file = new File("housing_finance_support_data.csv");
+            List<List<String>> fileData = FileUtils.readCsv(file);
+            SupportDataDto supportDataDto = new SupportDataDto();
+            int rowSize = fileData.size();
+            FileEnum[] fileEnums = FileEnum.values();
+
+            for(int i = 1; i < rowSize; i++){
+                List<String> row = fileData.get(i);
+                supportDataDto.setYear(Integer.valueOf(row.get(FileEnum.YEAR.getCol())));
+                supportDataDto.setMonth(Integer.valueOf(row.get(FileEnum.MONTH.getCol())));
+
+                for(FileEnum fileEnum : fileEnums){
+                    if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
+                        supportDataDto.setInstituteName(fileEnum.getInstitute_name());
+                        supportDataDto.setInstituteCode(bankService.getBankCode(fileEnum.getInstitute_name()));
+                        supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
+                        supportDataRepository.save(supportDataDto.toEntity());
+                    }
                 }
             }
+
+            responseData.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
+            responseData.setMsg(ErrorEnum.SUCCESS.getMsg());
         }
 
         return responseData;
@@ -81,29 +97,29 @@ public class SupportDataService implements SupportDataInterface {
         for(SupportSum supportOperation : supportSumList){
             int year = supportOperation.getYear();
             String instituteName = supportOperation.getInstituteName();
-            long supportSum = supportOperation.getSupportSum();
+            long sum = supportOperation.getSum();
 
             if(!yearArray.contains(year)){
-
                 SupportTotalDto supportTotal = new SupportTotalDto();
                 Map<String, Long> detail_amount = new HashMap<>();
-                detail_amount.put(instituteName, supportSum);
+                detail_amount.put(instituteName, sum);
                 yearArray.add(year);
 
                 supportTotal.setDetail_amount(detail_amount);
                 supportTotal.setYear(year);
-                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
+                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + sum);
                 supportTotalList.add(supportTotal);
             }else{
                 SupportTotalDto supportTotal = supportTotalList.stream().filter( o -> o.getYear() == year).findFirst().get();
                 Map<String, Long> detail_amount = supportTotal.getDetail_amount();
-                detail_amount.put(instituteName, supportSum);
+                detail_amount.put(instituteName, sum);
 
                 supportTotal.setYear(year);
-                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + supportSum);
-                supportTotalList.add(supportTotal);
+                supportTotal.setTotal_amount(supportTotal.getTotal_amount() + sum);
             }
         }
+        //sort
+        supportTotalList = supportTotalList.stream().sorted(Comparator.comparing(SupportTotalDto::getYear)).collect(Collectors.toList());
 
         response.setName(TITLE);
         response.setSupportTotalList(supportTotalList);
@@ -117,7 +133,7 @@ public class SupportDataService implements SupportDataInterface {
         ResponseDataFor3rd response = new ResponseDataFor3rd();
 
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
-        SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSupportSum)).get();
+        SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSum)).get();
 
         response.setBank(maxSupport.getInstituteName());
         response.setYear(String.valueOf(maxSupport.getYear()));
