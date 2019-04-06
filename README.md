@@ -8,6 +8,12 @@ Gradle
 Embedded tomcat  
 H2 Database  
 
+--- 
+
+- 분석 데이터  
+파일내용: 주택금융 신용보증 금융 기관별 공급현황  
+파일명 : housing_finance_support_data.csv  
+
 ---
 
 - 단위 테스트  
