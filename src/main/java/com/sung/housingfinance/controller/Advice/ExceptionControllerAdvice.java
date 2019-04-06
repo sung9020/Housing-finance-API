@@ -6,7 +6,7 @@ package com.sung.housingfinance.controller.Advice;
  */
 
 import com.sung.housingfinance.constants.ErrorEnum;
-import com.sung.housingfinance.dto.response.ResponseDataForError;
+import com.sung.housingfinance.dto.response.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,8 +23,8 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    ResponseDataForError handleException(Exception ex) {
-        ResponseDataForError result = new ResponseDataForError();
+    ResponseData handleException(Exception ex) {
+        ResponseData result = new ResponseData();
         result.setMsg(ErrorEnum.RUNTIME_ERROR.getMsg());
         result.setErrorCode(ErrorEnum.RUNTIME_ERROR.getErrorCode());
         log.error(ErrorEnum.RUNTIME_ERROR.getMsg());
@@ -35,8 +35,8 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    ResponseDataForError unauthorizedHandleException(AccessDeniedException ex) {
-        ResponseDataForError result = new ResponseDataForError();
+    ResponseData unauthorizedHandleException(AccessDeniedException ex) {
+        ResponseData result = new ResponseData();
         result.setMsg(ErrorEnum.FORBIDDEN_ERROR.getMsg());
         result.setErrorCode(ErrorEnum.FORBIDDEN_ERROR.getErrorCode());
         log.error(ErrorEnum.FORBIDDEN_ERROR.getMsg());
@@ -44,4 +44,15 @@ public class ExceptionControllerAdvice {
         return result;
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    ResponseData IllegalArgumentHandleException(IllegalArgumentException ex) {
+        ResponseData result = new ResponseData();
+        result.setMsg(ErrorEnum.DATA_INPUT_ERROR.getMsg());
+        result.setErrorCode(ErrorEnum.DATA_INPUT_ERROR.getErrorCode());
+        log.error(ErrorEnum.DATA_INPUT_ERROR.getMsg());
+
+        return result;
+    }
 }

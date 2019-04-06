@@ -15,11 +15,11 @@ public interface SupportDataInterface {
 
     ResponseData setSupportData() throws Exception;
 
-    ResponseDataFor2nd getSupportSum();
+    ResponseDataFor2nd getSupportSum() ;
 
-    ResponseDataFor3rd getMaxOfSupportSum();
+    ResponseDataFor3rd getMaxOfSupportSum()  ;
 
-    ResponseDataFor4th getMaxMinOfSupportAvg(String bankName);
+    ResponseDataFor4th getMaxMinOfSupportAvg(String bankName)  ;
 
-    ResponseDataFor5th getPredictedSupportData();
+    ResponseDataFor5th getPredictedSupportData(String bank, int month) ;
 }

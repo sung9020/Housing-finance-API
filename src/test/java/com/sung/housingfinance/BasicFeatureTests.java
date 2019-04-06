@@ -11,6 +11,8 @@ import com.sung.housingfinance.entity.SupportData;
 import com.sung.housingfinance.entity.SupportSum;
 import com.sung.housingfinance.repositoy.BankDataRepository;
 import com.sung.housingfinance.repositoy.SupportDataRepository;
+import com.sung.housingfinance.service.PolyCurveFittingInterface;
+import com.sung.housingfinance.service.impl.PolyCurveFitting;
 import com.sung.housingfinance.utils.FileUtils;
 import org.assertj.core.util.Streams;
 import org.hamcrest.Matchers;
@@ -45,6 +47,7 @@ public class BasicFeatureTests {
 
     @Autowired
     private BankDataRepository bankDataRepository;
+
 
     @Before
     public void setup() throws Exception{
@@ -190,10 +193,27 @@ public class BasicFeatureTests {
     }
 
     @Test
-    public void getPredictedSupportDataTest(){
+    public void 지원금액_예측_Tests(){
 
+        PolyCurveFittingInterface polyCurveFittingInterface = new PolyCurveFitting(2); // 2차원 다항식으로 커브피팅한다. y = a1 + a2 * x + a3 * x^2
+        List<SupportData> supportDataList = supportDataRepository.findByInstituteNameAndMonth("국민은행", 2);
+        int size = supportDataList.size();
+        double[] y = new double[size]; // 반드시 x, y가 같아야 한다. 그래야 2차원 매트릭스를 구현.
+        double[] x = new double[size];
+        for(int i = 1; i < size + 1; i++) { // 다음에 나올 데이터만 예측하면 되는 것이므로, 1씩 더해주면 다음,다음을 계속 구할수있음.
+            x[i - 1] = i; // i = 1 ~ size
+        }
+        for(int j = 0; j < size; j++){
+            y[j] = supportDataList.get(j).getSupportValue();
+        }
+        polyCurveFittingInterface.setData(y,x);
+        double predictedY = polyCurveFittingInterface.predictData(x.length + 1.0); // 다음 인덱스에 해당되는 값을 구한다.
+
+        assertThat(predictedY, Matchers.notNullValue());
+        assertThat(predictedY, Matchers.not(0));
 
     }
+
 
     private String getBankCode(String bankName){
             Iterable<Bank> bankDataIterable = bankDataRepository.findAll();

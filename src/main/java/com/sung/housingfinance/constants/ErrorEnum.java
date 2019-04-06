@@ -12,7 +12,8 @@ public enum ErrorEnum {
     RUNTIME_ERROR("500", "서버 에러가 발생했습니다."),
     FORBIDDEN_ERROR("403", "접근이 금지되었습니다. "),
     ALREADY_REGISTERED_USER_ERROR("1000", "이미 등록된 유저입니다."),
-    ALREADY_REGISTERED_FILE_ERROR("1100", "데이터가 이미 등록되었습니다.");
+    ALREADY_REGISTERED_FILE_ERROR("1100", "데이터가 이미 등록되었습니다."),
+    DATA_INPUT_ERROR("1200", "주택금융 지원금액 데이터를 먼저 추가해야 조회 가능합니다.");
 
     @Getter
     private final String errorCode;

@@ -14,6 +14,7 @@ import com.sung.housingfinance.entity.SupportAvg;
 import com.sung.housingfinance.entity.SupportData;
 import com.sung.housingfinance.entity.SupportSum;
 import com.sung.housingfinance.repositoy.SupportDataRepository;
+import com.sung.housingfinance.service.PolyCurveFittingInterface;
 import com.sung.housingfinance.service.SupportDataInterface;
 import com.sung.housingfinance.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,10 +88,14 @@ public class SupportDataService implements SupportDataInterface {
     }
 
     @Override
-    public ResponseDataFor2nd getSupportSum() {
+    public ResponseDataFor2nd getSupportSum()  {
         ResponseDataFor2nd response = new ResponseDataFor2nd();
 
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
+        if(supportSumList.size() < 1){
+            throw new IllegalArgumentException("");
+        }
+
         List<SupportTotalDto> supportTotalList = new ArrayList<>();
         List<Integer> yearArray = new ArrayList<>();
 
@@ -133,6 +138,10 @@ public class SupportDataService implements SupportDataInterface {
         ResponseDataFor3rd response = new ResponseDataFor3rd();
 
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
+        if(supportSumList.size() < 1){
+            throw new IllegalArgumentException("");
+        }
+
         SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSum)).get();
 
         response.setBank(maxSupport.getInstituteName());
@@ -142,11 +151,15 @@ public class SupportDataService implements SupportDataInterface {
     }
 
     @Override
-    public ResponseDataFor4th getMaxMinOfSupportAvg(String bankName) {
+    public ResponseDataFor4th getMaxMinOfSupportAvg(String bankName)  {
 
         ResponseDataFor4th response = new ResponseDataFor4th();
 
         List<SupportAvg> supportAvgList = supportDataRepository.findBySupportAvg(bankName);
+        if(supportAvgList.size() < 1){
+            throw new IllegalArgumentException("");
+        }
+
         List<SupportAmountDto> supportAmountList = new ArrayList<>();
         SupportAmountDto supportMax = new SupportAmountDto();
         SupportAmountDto supportMin = new SupportAmountDto();
@@ -172,7 +185,35 @@ public class SupportDataService implements SupportDataInterface {
     }
 
     @Override
-    public ResponseDataFor5th getPredictedSupportData() {
-        return null;
+    public ResponseDataFor5th getPredictedSupportData(String bank, int month) {
+
+            ResponseDataFor5th response = new ResponseDataFor5th();
+            final int predictedYear = 2018;
+
+            PolyCurveFittingInterface polyCurveFittingInterface = new PolyCurveFitting(2); // 2차원 다항식으로 커브피팅한다. y = a1 + a2 * x + a3 * x^2
+            List<SupportData> supportDataList = supportDataRepository.findByInstituteNameAndMonth(bank, month);
+            if(supportDataList.size() < 1){
+                throw new IllegalArgumentException("");
+            }
+
+            int dataSize = supportDataList.size();
+            double[] y = new double[dataSize]; // 반드시 x, y 배열 사이즈가 같아야 한다. 그래야 해당하는 x,y축 매트릭스를 구현.
+            double[] x = new double[dataSize];
+            for(int i = 1; i < dataSize + 1; i++) { // 일정 간격으로 증가하는 다음에 나올 데이터만 예측하면 되는 것이므로, 1씩 더해주면 다음,다음을 계속 구할수있음.
+                x[i - 1] = i; // i = 1 ~ size
+            }
+            for(int j = 0; j < dataSize; j++){
+                y[j] = supportDataList.get(j).getSupportValue();
+            }
+            polyCurveFittingInterface.setData(y,x);
+            double predictedY = polyCurveFittingInterface.predictData(x.length + 1); // 다음 인덱스에 해당하는 값은?
+
+            response.setBank(bank);
+            response.setAmount(String.valueOf(Math.round(predictedY)));
+            response.setYear(String.valueOf(predictedYear));
+            response.setMonth(String.valueOf(month));
+
+
+        return response;
     }
 }
