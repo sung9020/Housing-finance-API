@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +47,8 @@ public class SecurityService implements SecurityInterface {
 
         String token = "";
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException("Not found Entity"));
+        token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new UsernameNotFoundException(ErrorEnum.NOT_FOUND_USER_ERROR.getMsg()));
 
-        response.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
         response.setMsg(ErrorEnum.SUCCESS.getMsg());
         response.setUsername(request.getUsername());
         response.setToken(token);
@@ -68,14 +68,12 @@ public class SecurityService implements SecurityInterface {
             userRepository.save(user);
 
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException("Not found Entity"));
+            token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new UsernameNotFoundException(ErrorEnum.NOT_FOUND_USER_ERROR.getMsg()));
 
-            response.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
             response.setMsg(ErrorEnum.SUCCESS.getMsg());
             response.setUsername(request.getUsername());
             response.setToken(token);
         }else{
-            response.setErrorCode(ErrorEnum.ALREADY_REGISTERED_USER_ERROR.getErrorCode());
             response.setMsg(ErrorEnum.ALREADY_REGISTERED_USER_ERROR.getMsg());
             response.setUsername(request.getUsername());
             response.setToken("");
@@ -90,11 +88,11 @@ public class SecurityService implements SecurityInterface {
         ResponseDataForUser response = new ResponseDataForUser();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new EntityExistsException("Not found UserInfo"));
+        String token = Optional.of(jwtTokenProvider.createToken(authentication)).orElseThrow(() -> new UsernameNotFoundException(ErrorEnum.NOT_FOUND_USER_ERROR.getMsg()));
 
-        response.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
         response.setMsg(ErrorEnum.SUCCESS.getMsg());
         response.setToken(token);
+        response.setUsername(authentication.getName());
 
         return response;
     }

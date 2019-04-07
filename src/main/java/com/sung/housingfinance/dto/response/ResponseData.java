@@ -10,6 +10,5 @@ import lombok.Data;
  */
 @Data
 public class ResponseData {
-    private String errorCode;
     private String msg;
 }

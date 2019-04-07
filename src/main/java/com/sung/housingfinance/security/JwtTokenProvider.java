@@ -6,6 +6,7 @@ package com.sung.housingfinance.security;
  * @since 2019-04-03
  */
 
+import com.sung.housingfinance.constants.ErrorEnum;
 import com.sung.housingfinance.constants.RoleEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -83,10 +85,10 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         }catch (JwtException | IllegalArgumentException e){
-           log.error("에러메시지 :" + e.getMessage());
-           log.error("jwt 토큰 미보유 유저");
+            log.error("에러메시지 :" + e.getMessage());
+            log.error("jwt 토큰 미보유 유저");
+            throw new IllegalArgumentException(ErrorEnum.TOKEN_ERROR.getMsg());
         }
 
-        return false;
     }
 }

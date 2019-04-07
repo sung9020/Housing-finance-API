@@ -9,6 +9,8 @@ import com.sung.housingfinance.constants.ErrorEnum;
 import com.sung.housingfinance.dto.response.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,9 +27,18 @@ public class ExceptionControllerAdvice {
     @ResponseBody
     ResponseData handleException(Exception ex) {
         ResponseData result = new ResponseData();
-        result.setMsg(ErrorEnum.RUNTIME_ERROR.getMsg());
-        result.setErrorCode(ErrorEnum.RUNTIME_ERROR.getErrorCode());
-        log.error(ErrorEnum.RUNTIME_ERROR.getMsg());
+        result.setMsg(ErrorEnum.RUNTIME_ERROR.getMsg()); //not custom
+        log.error(ex.getMessage());
+        return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    ResponseData handleUnauthorizedException(AccessDeniedException ex) {
+        ResponseData result = new ResponseData();
+        result.setMsg(ErrorEnum.FORBIDDEN_ERROR.getMsg()); //not custom
+        log.error(ex.getMessage());
 
         return result;
     }
@@ -35,11 +46,10 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    ResponseData unauthorizedHandleException(AccessDeniedException ex) {
+    ResponseData handleAuthenticationException(AuthenticationException ex) {
         ResponseData result = new ResponseData();
-        result.setMsg(ErrorEnum.FORBIDDEN_ERROR.getMsg());
-        result.setErrorCode(ErrorEnum.FORBIDDEN_ERROR.getErrorCode());
-        log.error(ErrorEnum.FORBIDDEN_ERROR.getMsg());
+        result.setMsg(ErrorEnum.FORBIDDEN_ERROR.getMsg()); //not custom
+        log.error(ex.getMessage());
 
         return result;
     }
@@ -47,11 +57,21 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    ResponseData IllegalArgumentHandleException(IllegalArgumentException ex) {
+    ResponseData handleIllegalArgumentException(IllegalArgumentException ex) {
         ResponseData result = new ResponseData();
-        result.setMsg(ErrorEnum.DATA_INPUT_ERROR.getMsg());
-        result.setErrorCode(ErrorEnum.DATA_INPUT_ERROR.getErrorCode());
-        log.error(ErrorEnum.DATA_INPUT_ERROR.getMsg());
+        result.setMsg(ex.getMessage());
+        log.error(ex.getMessage());
+
+        return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    ResponseData handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        ResponseData result = new ResponseData();
+        result.setMsg(ex.getMessage());
+        log.error(ex.getMessage());
 
         return result;
     }

@@ -55,7 +55,6 @@ public class SupportDataService implements SupportDataInterface {
         List<SupportData> supportDataIterable = supportDataRepository.findAll();
 
         if(supportDataIterable.size() > 0){
-            responseData.setErrorCode(ErrorEnum.ALREADY_REGISTERED_FILE_ERROR.getErrorCode());
             responseData.setMsg(ErrorEnum.ALREADY_REGISTERED_FILE_ERROR.getMsg());
 
         }else{
@@ -80,7 +79,6 @@ public class SupportDataService implements SupportDataInterface {
                 }
             }
 
-            responseData.setErrorCode(ErrorEnum.SUCCESS.getErrorCode());
             responseData.setMsg(ErrorEnum.SUCCESS.getMsg());
         }
 
@@ -93,7 +91,7 @@ public class SupportDataService implements SupportDataInterface {
 
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
         if(supportSumList.size() < 1){
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException(ErrorEnum.DATA_INPUT_ERROR.getMsg());
         }
 
         List<SupportTotalDto> supportTotalList = new ArrayList<>();
@@ -139,7 +137,7 @@ public class SupportDataService implements SupportDataInterface {
 
         List<SupportSum> supportSumList = supportDataRepository.findBySupportSum();
         if(supportSumList.size() < 1){
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException(ErrorEnum.DATA_INPUT_ERROR.getMsg());
         }
 
         SupportSum maxSupport = supportSumList.stream().max(Comparator.comparing(SupportSum::getSum)).get();
@@ -157,7 +155,7 @@ public class SupportDataService implements SupportDataInterface {
 
         List<SupportAvg> supportAvgList = supportDataRepository.findBySupportAvg(bankName);
         if(supportAvgList.size() < 1){
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException(ErrorEnum.DATA_INPUT_ERROR.getMsg());
         }
 
         List<SupportAmountDto> supportAmountList = new ArrayList<>();
@@ -189,11 +187,12 @@ public class SupportDataService implements SupportDataInterface {
 
             ResponseDataFor5th response = new ResponseDataFor5th();
             final int predictedYear = 2018;
+            String bankCode = bankService.getBankCode(bank);
 
             PolyCurveFittingInterface polyCurveFittingInterface = new PolyCurveFitting(2); // 2차원 다항식으로 커브피팅한다. y = a1 + a2 * x + a3 * x^2
             List<SupportData> supportDataList = supportDataRepository.findByInstituteNameAndMonth(bank, month);
             if(supportDataList.size() < 1){
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException(ErrorEnum.DATA_INPUT_ERROR.getMsg());
             }
 
             int dataSize = supportDataList.size();
@@ -208,7 +207,7 @@ public class SupportDataService implements SupportDataInterface {
             polyCurveFittingInterface.setData(y,x);
             double predictedY = polyCurveFittingInterface.predictData(x.length + 1); // 다음 인덱스에 해당하는 값은?
 
-            response.setBank(bank);
+            response.setBank(bankCode);
             response.setAmount(String.valueOf(Math.round(predictedY)));
             response.setYear(String.valueOf(predictedYear));
             response.setMonth(String.valueOf(month));

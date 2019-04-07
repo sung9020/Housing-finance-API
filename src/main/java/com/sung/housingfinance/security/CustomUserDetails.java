@@ -1,5 +1,6 @@
 package com.sung.housingfinance.security;
 
+import com.sung.housingfinance.constants.ErrorEnum;
 import com.sung.housingfinance.constants.RoleEnum;
 import com.sung.housingfinance.entity.User;
 import com.sung.housingfinance.repositoy.UserRepository;
@@ -25,7 +26,7 @@ public class CustomUserDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(() -> new UsernameNotFoundException(""));
+        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(() -> new UsernameNotFoundException(ErrorEnum.NOT_FOUND_USER_ERROR.getMsg()));
 
 
         return org.springframework.security.core.userdetails.User
