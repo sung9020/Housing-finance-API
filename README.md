@@ -8,10 +8,16 @@ Gradle
 Embedded tomcat  
 H2 Database  
 
+--- 
+
+- 분석 데이터  
+파일내용: 주택금융 신용보증 금융 기관별 공급현황  
+파일명 : housing_finance_support_data.csv  
+
 ---
 
 - 단위 테스트  
-1. 기본 기능 테스트
+1. 기본 기능 테스트  
 -> csv 읽기 테스트  
 -> 은행 이름으로 DB에서 은행 코드 찾기  
 -> 은행 리스트 조회  
