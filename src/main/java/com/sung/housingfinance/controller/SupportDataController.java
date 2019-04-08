@@ -64,8 +64,8 @@ public class SupportDataController {
 
     @GetMapping("ALL/next/{bank}/{month}")
     @ApiOperation(value ="2018년도 특정은행 특정달의 지원금액 예측 API")
-    public ResponseDataFor5th getPredictedSupportData(@ApiParam(required = true, name="bank", value = "은행 이름") @PathVariable("bank") String bank,
-                                                      @ApiParam(required = true, name="month", value = "월 입력") @PathVariable("month") int month ) throws Exception {
+    public ResponseDataFor5th getPredictedSupportData(@ApiParam(required = true, name="bank", value = "은행 이름", example = "국민은행") @PathVariable("bank") String bank,
+                                                      @ApiParam(required = true, name="month", value = "월 입력", example = "2") @PathVariable("month") int month ) throws Exception {
 
         ResponseDataFor5th response = supportDataInterface.getPredictedSupportData(bank, month);
 
