@@ -13,7 +13,7 @@ H2 Database
 - 분석 데이터  
 파일내용: 주택금융 신용보증 금융 기관별 공급현황  
 파일명 : housing_finance_support_data.csv  
-파일위치 : jar 빌드 파일(housingfinance-0.0.1-SNAPSHOT.jar) 위치에 넣으면 분석이 가능하다. 
+파일위치 : jar 빌드 파일(housingfinance-0.0.1-SNAPSHOT.jar)와 같은 위치에 csv 파일을 저장 해놓으면 분석이 가능하다.   
 
 ---
 
