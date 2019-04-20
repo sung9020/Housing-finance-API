@@ -59,7 +59,6 @@ public class RepositoryTests {
         supportDataA.setYear(2014);
         supportDataA.setMonth(3);
         supportDataA.setInstituteName("주택도시기금");
-        supportDataA.setInstituteCode("BNK093");
         supportDataA.setSupportValue(2422);
 
         supportDataRepository.save(supportDataA);

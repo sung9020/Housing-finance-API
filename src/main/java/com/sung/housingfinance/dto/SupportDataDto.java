@@ -16,7 +16,6 @@ public class SupportDataDto {
     private int year;
     private int month;
     private String instituteName;
-    private String instituteCode;
     private int supportValue;
 
     public SupportDataDto(){}
@@ -25,7 +24,6 @@ public class SupportDataDto {
         this.year = entity.getYear();
         this.month = entity.getMonth();
         this.instituteName = entity.getInstituteName();
-        this.instituteCode = entity.getInstituteCode();
         this.supportValue = entity.getSupportValue();
     }
 
@@ -34,7 +32,6 @@ public class SupportDataDto {
         supportData.setYear(year);
         supportData.setMonth(month);
         supportData.setInstituteName(instituteName);
-        supportData.setInstituteCode(instituteCode);
         supportData.setSupportValue(supportValue);
 
         return supportData;

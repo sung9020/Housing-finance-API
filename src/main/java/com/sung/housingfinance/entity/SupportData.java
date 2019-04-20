@@ -35,8 +35,5 @@ public class SupportData {
     private String instituteName;
 
     @Column
-    private String instituteCode;
-
-    @Column
     private int supportValue;
 }

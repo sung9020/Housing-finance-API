@@ -72,7 +72,6 @@ public class SupportDataService implements SupportDataInterface {
                 for(FileEnum fileEnum : fileEnums){
                     if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
                         supportDataDto.setInstituteName(fileEnum.getInstitute_name());
-                        supportDataDto.setInstituteCode(bankService.getBankCode(fileEnum.getInstitute_name()));
                         supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
                         supportDataRepository.save(supportDataDto.toEntity());
                     }

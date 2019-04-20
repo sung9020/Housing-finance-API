@@ -12,13 +12,11 @@ public class SupportSum {
 
     private int year;
     private String instituteName;
-    private String instituteCode;
-    private long sum ;
+    private long sum;
 
-    public SupportSum(int year, String instituteName, String instituteCode, long sum){
+    public SupportSum(int year, String instituteName, long sum){
         this.year = year;
         this.instituteName = instituteName;
-        this.instituteCode = instituteCode;
         this.sum = sum;
     }
 }

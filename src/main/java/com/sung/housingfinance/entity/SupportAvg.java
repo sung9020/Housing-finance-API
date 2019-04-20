@@ -12,13 +12,11 @@ public class SupportAvg {
 
     private int year;
     private String instituteName;
-    private String instituteCode;
     private Double supportAvg;
 
-    public SupportAvg(int year, String instituteName, String instituteCode, Double supportAvg){
+    public SupportAvg(int year, String instituteName, Double supportAvg){
         this.year = year;
         this.instituteName = instituteName;
-        this.instituteCode = instituteCode;
         this.supportAvg = supportAvg;
     }
 

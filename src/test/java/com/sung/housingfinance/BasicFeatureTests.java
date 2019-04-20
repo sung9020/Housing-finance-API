@@ -242,7 +242,6 @@ public class BasicFeatureTests {
             for(FileEnum fileEnum : fileEnums){
                 if(fileEnum.getCol() > FileEnum.MONTH.getCol()){
                     supportDataDto.setInstituteName(fileEnum.getInstitute_name());
-                    supportDataDto.setInstituteCode(getBankCode(fileEnum.getInstitute_name()));
                     supportDataDto.setSupportValue(Integer.valueOf(row.get(fileEnum.getCol())));
                     supportDataRepository.save(supportDataDto.toEntity());
                 }

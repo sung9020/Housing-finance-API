@@ -18,10 +18,10 @@ public interface SupportDataRepository extends JpaRepository<SupportData, Long> 
 
     SupportData findFirstByInstituteName(String institute_name);
 
-    @Query("select new com.sung.housingfinance.entity.SupportSum(m.year, m.instituteName, m.instituteCode, sum(m.supportValue)) from SupportData m Group by m.year, m.instituteName")
+    @Query("select new com.sung.housingfinance.entity.SupportSum(m.year, m.instituteName, sum(m.supportValue)) from SupportData m Group by m.year, m.instituteName")
     List<SupportSum> findBySupportSum();
 
-    @Query("select new com.sung.housingfinance.entity.SupportAvg(m.year, m.instituteName, m.instituteCode, avg(m.supportValue)) from SupportData m where m.instituteName =:instituteName Group by m.year, m.instituteName")
+    @Query("select new com.sung.housingfinance.entity.SupportAvg(m.year, m.instituteName, avg(m.supportValue)) from SupportData m where m.instituteName =:instituteName Group by m.year, m.instituteName")
     List<SupportAvg> findBySupportAvg(@Param("instituteName") String instituteName);
 
     List<SupportData> findByInstituteNameAndMonth(String institute_name, int month);
