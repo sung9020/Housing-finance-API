@@ -6,6 +6,7 @@ package com.sung.housingfinance.dto;/*
 
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,4 +19,10 @@ public class SupportTotalDto {
     private long total_amount;
     private Map<String, Long> detail_amount;
 
+
+    public SupportTotalDto() {
+        this.year = 0;
+        this.total_amount = 0;
+        this.detail_amount = new HashMap<>();
+    }
 }

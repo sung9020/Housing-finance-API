@@ -6,6 +6,7 @@ package com.sung.housingfinance.security;
  * @since 2019-04-03
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sung.housingfinance.constants.ErrorEnum;
 import com.sung.housingfinance.constants.RoleEnum;
 import io.jsonwebtoken.Claims;
@@ -19,13 +20,21 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -42,44 +51,55 @@ public class JwtTokenProvider {
     @Autowired
     private CustomUserDetails customUserDetails;
 
+    private final String AUTH_TOKEN_KEYWORD = "AUTH";
+
+    private final String AUTH_MAP_KEYWORD = "authority";
+
+
     @PostConstruct
     protected void init(){
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     public String createToken(Authentication authentication){
-        Claims claims = Jwts.claims().setSubject(authentication.getName());
-        claims.put("auth", AuthorityUtils.createAuthorityList(RoleEnum.ADMIN.getRole()));
-        claims.setId(String.valueOf(UUID.randomUUID()));
+        Claims claims = Jwts.claims();
+        claims.put(AUTH_TOKEN_KEYWORD, AuthorityUtils.createAuthorityList(RoleEnum.ADMIN.getRole()));
 
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + expireInMilliseconds);
 
         return Jwts.builder()
                 .setClaims(claims)
+                .setSubject(authentication.getName())
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
+                .setId(String.valueOf(UUID.randomUUID()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
-    public String getUserInfoByJWT(String token){
+    private Claims getUserInfoByJWT(String token){
         Claims claims = Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 
-        return claims.getSubject();
+        return claims;
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails userDetails = customUserDetails.loadUserByUsername(getUserInfoByJWT(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", AuthorityUtils.createAuthorityList(RoleEnum.ADMIN.getRole()));
+        Claims claims = getUserInfoByJWT(token);
+        UserDetails userDetails = customUserDetails.loadUserByUsername(claims.getSubject());
+
+        if(claims.get(AUTH_TOKEN_KEYWORD) instanceof List){
+            List<GrantedAuthority> grantedAuthorityList = getAuthListByToken((List) claims.get(AUTH_TOKEN_KEYWORD));
+            return new UsernamePasswordAuthenticationToken(userDetails, "", grantedAuthorityList);
+        }else{
+            throw new IllegalArgumentException(ErrorEnum.FORBIDDEN_ERROR.getMsg());
+        }
     }
 
-
-
-    public boolean vaildateToken(String token){
+    boolean vaildateToken(String token){
 
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -90,5 +110,22 @@ public class JwtTokenProvider {
             throw new IllegalArgumentException(ErrorEnum.TOKEN_ERROR.getMsg());
         }
 
+    }
+
+    private List<GrantedAuthority> getAuthListByToken(List tokenAuthorityList){
+
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
+        int tokenAuthorityListSize = tokenAuthorityList.size();
+        for(int i = 0; i < tokenAuthorityListSize; i++){
+            if(tokenAuthorityList.get(i) instanceof Map){
+                Map authMap = (Map) tokenAuthorityList.get(i);
+                if(authMap.get("authority") instanceof String){
+                    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(String.valueOf(authMap.get(AUTH_MAP_KEYWORD)));
+                    grantedAuthorityList.add(grantedAuthority);
+                }
+            }
+        }
+
+        return grantedAuthorityList;
     }
 }

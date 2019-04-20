@@ -104,7 +104,7 @@ public class SupportDataService implements SupportDataInterface {
 
             if(!yearArray.contains(year)){
                 SupportTotalDto supportTotal = new SupportTotalDto();
-                Map<String, Long> detail_amount = new HashMap<>();
+                Map<String, Long> detail_amount = supportTotal.getDetail_amount();
                 detail_amount.put(instituteName, sum);
                 yearArray.add(year);
 
